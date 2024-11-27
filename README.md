@@ -1,2 +1,1 @@
-#hello checking if the commit worked - ghuas
-
+I will let you guys know via snapchat groupchat on what needs to be done by each of you. You will have a deadline so please try to stick to it as delays may restrict someone else from doing their tasks. I will comment the general logic and flow of the code and then try to implement it. Any questions, just send them in snapchat groupchat.
