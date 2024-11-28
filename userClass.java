@@ -1,12 +1,13 @@
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 public class userClass {
     private String name;
     private double accountBalance;
     private double monthlyBudget;
-    private List<itemClass> individualItems;
-    private List<sharedItemClass> sharedItems;
+    private ArrayList<itemClass> individualItems;
+    private ArrayList<sharedItemClass> sharedItems;
     private boolean hasConfirmed;
 
     public String getName() {
@@ -33,19 +34,19 @@ public class userClass {
         this.monthlyBudget = monthlyBudget;
     }
 
-    public List<itemClass> getIndividualItems() {
+    public ArrayList<itemClass> getIndividualItems() {
         return individualItems;
     }
     
-    public void setIndividualItems(List<itemClass> individualItems) {
+    public void setIndividualItems(ArrayList<itemClass> individualItems) {
         this.individualItems = individualItems;
     }
     
-    public List<sharedItemClass> getSharedItems() {
+    public ArrayList<sharedItemClass> getSharedItems() {
         return sharedItems;
     }
     
-    public void setSharedItems(List<sharedItemClass> sharedItems) {
+    public void setSharedItems(ArrayList<sharedItemClass> sharedItems) {
         this.sharedItems = sharedItems;
     }
     

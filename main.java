@@ -1,9 +1,29 @@
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class main {
     //we will initialise 2 lists of items for 2 different supermarkets
+    public List<itemClass> superMarket1 = new ArrayList<>();
+    public List<itemClass> superMarket2 = new ArrayList<>();
+    public void initializeSuperMarkets() {
+        superMarket1.add(new itemClass("Eggs", 2, true));
+        superMarket1.add(new itemClass("Milk", 1.2, true));
+        superMarket1.add(new itemClass("Bread", 1, true));
+        superMarket1.add(new itemClass("Butter",1 , true));
+        superMarket1.add(new itemClass("Chicken", 5.4, true));
+        superMarket1.add(new itemClass("Dish soap", 3, false));
+        superMarket1.add(new itemClass("Shampoo", 4.5, true)); 
+        superMarket1.add(new itemClass("Toilet Paper", 2.8, true));
+        superMarket1.add(new itemClass("Notebook and pen combo", 2.5, true)); 
+        superMarket1.add(new itemClass("Batteries", 6.0, true)); 
+        superMarket1.add(new itemClass("Dog Food", 8.5, false)); 
+    }
 
     //we will initialise users 
         
     public static void main(String[] args) {
+        System.out.println("test");
         // prompt for username, chosen supermarket
 
         // initiate order object with username and supermarket

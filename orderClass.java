@@ -1,9 +1,9 @@
-import java.util.List;
+import java.util.ArrayList;
 
 public class orderClass {
     private String supermarket;
-    private List<userClass> participants;
-    private List<itemClass> allItems;
+    private ArrayList<userClass> participants;
+    private ArrayList<itemClass> allItems;
     private userClass initiator;
     private boolean isFinalized;
 
@@ -15,19 +15,19 @@ public class orderClass {
         this.supermarket = supermarket;
     }
 
-    public List<userClass> getParticipants() {
+    public ArrayList<userClass> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<userClass> participants) {
+    public void setParticipants(ArrayList<userClass> participants) {
         this.participants = participants;
     }
 
-    public List<itemClass> getAllItems() {
+    public ArrayList<itemClass> getAllItems() {
         return allItems;
     }
 
-    public void setAllItems(List<itemClass> allItems) {
+    public void setAllItems(ArrayList<itemClass> allItems) {
         this.allItems = allItems;
     }
 

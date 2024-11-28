@@ -3,6 +3,12 @@ public class itemClass {
     private double price;
     private boolean availability;
 
+    public itemClass(String name, double price, boolean availability) {
+        this.name = name;
+        this.price = price;
+        this.availability = availability;
+    }
+
     public String getName() {
         return name;
     }

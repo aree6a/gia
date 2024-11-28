@@ -1,13 +1,13 @@
-import java.util.List;
+import java.util.ArrayList;
 
 public class sharedItemClass {
-    private List<userClass> sharedBy;
+    private ArrayList<userClass> sharedBy;
 
-    public List<userClass> getSharedBy() {
+    public ArrayList<userClass> getSharedBy() {
         return sharedBy;
     }
 
-    public void setSharedBy(List<userClass> sharedBy) {
+    public void setSharedBy(ArrayList<userClass> sharedBy) {
         this.sharedBy = sharedBy;
     }
 }
