@@ -10,6 +10,13 @@ public class userClass {
     private ArrayList<sharedItemClass> sharedItems;
     private boolean hasConfirmed;
 
+    public userClass(String name, double accountBalance, double monthlyBudget) {
+        this.name = name;
+        this.accountBalance = accountBalance;
+        this.monthlyBudget = monthlyBudget;
+    }
+
+
     public String getName() {
         return name;
     }

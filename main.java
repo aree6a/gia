@@ -2,25 +2,55 @@
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class main {
-    //we will initialise 2 lists of items for 2 different supermarkets
+
+    // Lists of items for 2 different supermarkets
     public List<itemClass> superMarket1 = new ArrayList<>();
     public List<itemClass> superMarket2 = new ArrayList<>();
+
+    // Initialize supermarket items
     public void initializeSuperMarkets() {
         superMarket1.add(new itemClass("Eggs", 2, true));
         superMarket1.add(new itemClass("Milk", 1.2, true));
         superMarket1.add(new itemClass("Bread", 1, true));
-        superMarket1.add(new itemClass("Butter",1 , true));
+        superMarket1.add(new itemClass("Butter", 1, true));
         superMarket1.add(new itemClass("Chicken", 5.4, true));
         superMarket1.add(new itemClass("Dish soap", 3, false));
-        superMarket1.add(new itemClass("Shampoo", 4.5, true)); 
+        superMarket1.add(new itemClass("Shampoo", 4.5, true));
         superMarket1.add(new itemClass("Toilet Paper", 2.8, true));
-        superMarket1.add(new itemClass("Notebook and pen combo", 2.5, true)); 
-        superMarket1.add(new itemClass("Batteries", 6.0, true)); 
-        superMarket1.add(new itemClass("Dog Food", 8.5, false)); 
+        superMarket1.add(new itemClass("Notebook and pen combo", 2.5, true));
+        superMarket1.add(new itemClass("Batteries", 6.0, true));
+        superMarket1.add(new itemClass("Dog Food", 8.5, false));
+
+        superMarket2.add(new itemClass("Eggs", 1.6, true));
+        superMarket2.add(new itemClass("Milk", 1.4, true));
+        superMarket2.add(new itemClass("Bread", 0.7, true));
+        superMarket2.add(new itemClass("Butter", 1.8, true));
+        superMarket2.add(new itemClass("Chicken", 4.9, true));
+        superMarket2.add(new itemClass("Dish soap", 4, true));
+        superMarket2.add(new itemClass("Shampoo", 3, false));
+        superMarket2.add(new itemClass("Toilet Paper", 2.4, true));
+        superMarket2.add(new itemClass("Notebook and pen combo", 3.0, false));
+        superMarket2.add(new itemClass("Batteries", 5.5, false));
+        superMarket2.add(new itemClass("Dog Food", 10.0, true));
     }
+    //cooking
+
+    public List<userClass> users = new ArrayList<>();
 
     //we will initialise users 
+    public void intializeusers() {
+        users.add(new userClass("Ismaiel", 2000.0, 250));
+        users.add(new userClass("Ghuas", 1252.0, 440));
+        users.add(new userClass("Hassan", 1701.0, 600));
+        users.add(new userClass("Ziad", 1926.0, 200));
+        users.add(new userClass("Areeba", 10000.0, 300));
+
+    }
+
+
+    
         
     public static void main(String[] args) {
         System.out.println("test");
