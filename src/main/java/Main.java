@@ -1,16 +1,20 @@
-
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
-
-public class main {
+public class Main{
 
     // Lists of items for 2 different supermarkets
-    public List<itemClass> superMarket1 = new ArrayList<>();
-    public List<itemClass> superMarket2 = new ArrayList<>();
+    public static List<itemClass> superMarket1 = new ArrayList<>();
+    public static List<itemClass> superMarket2 = new ArrayList<>();
 
     // Initialize supermarket items
-    public void initializeSuperMarkets() {
+    public static void initializeSuperMarkets() {
         superMarket1.add(new itemClass("Eggs", 2, true));
         superMarket1.add(new itemClass("Milk", 1.2, true));
         superMarket1.add(new itemClass("Bread", 1, true));
@@ -37,10 +41,10 @@ public class main {
     }
     //cooking
 
-    public List<userClass> users = new ArrayList<>();
+    public static List<userClass> users = new ArrayList<>();
 
     //we will initialise users 
-    public void intializeusers() {
+    public static void intializeusers() {
         users.add(new userClass("Ismaiel", 2000.0, 250));
         users.add(new userClass("Ghuas", 1252.0, 440));
         users.add(new userClass("Hassan", 1701.0, 600));
@@ -52,8 +56,22 @@ public class main {
 
     
         
-    public static void main(String[] args) {
-        System.out.println("test");
+    public static void main (String[] args) {
+        initializeSuperMarkets();
+        intializeusers();
+
+        System.out.println("Welcome\n Pick a supermarket to get started\n");
+        for (int i = 0; i < superMarket1.size(); i++) {
+            System.out.print(superMarket1.get(i).getName() + superMarket1.get(i).getPrice() + " ");
+        }
+
+        for (int i = 0; i < superMarket2.size(); i++) {
+            System.out.println(superMarket2.get(i).getName());
+        }
+
+
+        
+
         // prompt for username, chosen supermarket
 
         // initiate order object with username and supermarket
