@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class Main{
+public class Main extends Application{
 
     // Lists of items for 2 different supermarkets
     public static List<itemClass> superMarket1 = new ArrayList<>();
@@ -44,33 +44,69 @@ public class Main{
     public static List<userClass> users = new ArrayList<>();
 
     //we will initialise users 
-    public static void intializeusers() {
+    public static void intializeUsers() {
         users.add(new userClass("Ismaiel", 2000.0, 250));
         users.add(new userClass("Ghuas", 1252.0, 440));
         users.add(new userClass("Hassan", 1701.0, 600));
         users.add(new userClass("Ziad", 1926.0, 200));
         users.add(new userClass("Areeba", 10000.0, 300));
-
     }
 
 
-    
+
+    public void start(Stage primaryStage) throws Exception {
+        initializeSuperMarkets();
+        intializeUsers();
+
+        // welcome label
+        Label welcomeLabel = new Label("Welcome! Please see the items available at each supermarket:");
+
+        // supermarket 1 section
+        Button supermarket1Button = new Button("Asda");
+        ListView<String> supermarket1ListView = new ListView<>();
+        for (itemClass item : superMarket1) {
+            String stock = " ";
+            if(item.getAvailability() == true){
+                stock = "available";
+            }
+            else stock = "unavailable";
+
+            supermarket1ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " " + stock);
+        }
+
+        // supermarket 2 section
+        Button supermarket2Button = new Button("Tesco");
+        ListView<String> supermarket2ListView = new ListView<>();
+        for (itemClass item : superMarket2) {
+            String stock = " ";
+            if(item.getAvailability() == true){
+                stock = "available";
+            }
+            else stock = "unavailable";
+
+            supermarket2ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " " + stock);
+        }
+
+        // setting up layout
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(
+                welcomeLabel,
+                supermarket1Button,
+                supermarket1ListView,
+                supermarket2Button,
+                supermarket2ListView
+        );
+
+        Scene scene = new Scene(vbox, 600, 600);
+        primaryStage.setTitle("SSH Delivery");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
         
     public static void main (String[] args) {
-        initializeSuperMarkets();
-        intializeusers();
 
-        System.out.println("Welcome\n Pick a supermarket to get started\n");
-        for (int i = 0; i < superMarket1.size(); i++) {
-            System.out.print(superMarket1.get(i).getName() + superMarket1.get(i).getPrice() + " ");
-        }
-
-        for (int i = 0; i < superMarket2.size(); i++) {
-            System.out.println(superMarket2.get(i).getName());
-        }
-
-
-        
+        launch(args);
 
         // prompt for username, chosen supermarket
 
