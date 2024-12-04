@@ -1,10 +1,17 @@
 import java.util.ArrayList;
 import java.util.List;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -69,12 +76,34 @@ public class Main extends Application {
         Button supermarket2Button = new Button("Tesco");
         supermarket2Button.setOnAction(e -> handleSupermarketSelection(superMarket2, "Tesco"));
 
+        ListView<String> supermarket1ListView = new ListView<>();
+        for (itemClass item : superMarket1) {
+            String stock = " ";
+            if(item.getAvailability() == true){
+                stock = "available";
+            }
+            else stock = "unavailable";
+
+            supermarket1ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " - " + stock);
+        }
+
+        ListView<String> supermarket2ListView = new ListView<>();
+        for (itemClass item : superMarket2) {
+            String stock = " ";
+            if(item.getAvailability() == true){
+                stock = "available";
+            }
+            else stock = "unavailable";
+
+            supermarket2ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " - " + stock);
+        }
+
         // Setting up layout
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(10));
-        vbox.getChildren().addAll(welcomeLabel, supermarket1Button, supermarket2Button);
+        vbox.getChildren().addAll(welcomeLabel, supermarket1Button, supermarket1ListView, supermarket2Button, supermarket2ListView);
 
-        Scene scene = new Scene(vbox, 600, 300);
+        Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setTitle("SSH Delivery");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -86,18 +115,34 @@ public class Main extends Application {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
 
-        Label instruction = new Label("Choose your name to start an order at " + supermarketName + ":");
-        ComboBox<String> userDropdown = new ComboBox<>();
-        for (userClass user : users) {
-            userDropdown.getItems().add(user.getName());
+        Label instruction = new Label("Choose your name to start an order at " + supermarketName + ":");  
+        ComboBox<userClass> userDropdown = new ComboBox<>();
+        for (userClass user : users) {                                              
+            userDropdown.getItems().add(user);            // ADDING USER OBJECTS TO THE COMBO BOX (THESE WOULD BE DISPLAYED AS userClass@2726, userClass@1830, etc)
         }
+
+         userDropdown.setCellFactory(lv -> new ListCell<userClass>() {  //SET CELL FACTORY AND BUTTON BOTH MAKE IT SO THAT THE OBJECTS ARE DISPLAYED AS THEIR NAME ATTRIUBUTE (user.getName)
+        @Override                                                       //PLEASE IN FUTURE USE THE OBJECTS AND DONT JUST PASS STRINGS INTO FUNCTIONS, THE CLASSES HAVE BEEN DEFINED FOR A REASON   
+        protected void updateItem(userClass user, boolean empty) {
+            super.updateItem(user, empty);
+            setText(empty ? null : user.getName());
+        }
+    });
+
+    userDropdown.setButtonCell(new ListCell<userClass>() {
+        @Override
+        protected void updateItem(userClass user, boolean empty) {  
+            super.updateItem(user, empty);
+            setText(empty ? null : user.getName());
+        }
+    });
 
         Button proceedButton = new Button("Start Order");
         proceedButton.setOnAction(e -> {
             if (userDropdown.getValue() != null) {
-                String selectedUser = userDropdown.getValue();
-                stage.close();
-                handleUserOrder(selectedUser, supermarket, supermarketName);
+                userClass selectedUser = userDropdown.getValue(); // HERE WE NOW HAVE THE OBJECT INSTEAD OF A STRING AS WE DID IN THE LAST COMMIT, THIS MAKES WORKING WITH THE REST 
+                stage.close();                                    // OF THE FUNCTIONS MUCH EASIER AND IT WILL FLOW MUCH BETTER
+                handleUserOrder(selectedUser, supermarket);
             }
         });
 
@@ -107,22 +152,29 @@ public class Main extends Application {
         stage.show();
     }
 
-    private void handleUserOrder(String userName, List<itemClass> supermarket, String supermarketName) {
+    private void handleUserOrder(userClass user, List<itemClass> supermarket) { 
         Stage stage = new Stage();
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
 
-        Label welcome = new Label("Welcome " + userName + "! Select items to add to your order:");
+        Label welcome = new Label("Welcome " + user.getName() + "! Select items to add to your order:");
         ListView<CheckBox> itemListView = new ListView<>();
         for (itemClass item : supermarket) {
-            CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice());
+            String stock = " ";
+            if(item.getAvailability() == true){
+                stock = "available";
+            }
+            else stock = "unavailable";
+
+            CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice() + " - " + stock);
             itemListView.getItems().add(itemCheckBox);
+
         }
+    
 
         Button finalizeButton = new Button("Finalize Order");
         finalizeButton.setOnAction(e -> {
-            userClass user = getUserByName(userName);
             if (user != null) {
                 for (CheckBox itemCheckBox : itemListView.getItems()) {
                     if (itemCheckBox.isSelected()) {
