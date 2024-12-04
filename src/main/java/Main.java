@@ -7,11 +7,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class Main extends Application{
+public class Main extends Application {
 
     // Lists of items for 2 different supermarkets
     public static List<itemClass> superMarket1 = new ArrayList<>();
     public static List<itemClass> superMarket2 = new ArrayList<>();
+
+    private double totalCost = 0.0; // Declare at the class level
 
     // Initialize supermarket items
     public static void initializeSuperMarkets() {
@@ -39,12 +41,11 @@ public class Main extends Application{
         superMarket2.add(new itemClass("Batteries", 5.5, false));
         superMarket2.add(new itemClass("Dog Food", 10.0, true));
     }
-    //cooking
 
     public static List<userClass> users = new ArrayList<>();
 
-    //we will initialise users 
-    public static void intializeUsers() {
+    // Initialize users
+    public static void initializeUsers() {
         users.add(new userClass("Ismaiel", 2000.0, 250));
         users.add(new userClass("Ghuas", 1252.0, 440));
         users.add(new userClass("Hassan", 1701.0, 600));
@@ -52,79 +53,152 @@ public class Main extends Application{
         users.add(new userClass("Areeba", 10000.0, 300));
     }
 
-
-
-    public void start(Stage primaryStage) throws Exception {
+    @Override
+    public void start(Stage primaryStage) {
         initializeSuperMarkets();
-        intializeUsers();
+        initializeUsers();
 
-        // welcome label
+        // Welcome label
         Label welcomeLabel = new Label("Welcome! Please see the items available at each supermarket:");
 
-        // supermarket 1 section
+        // Supermarket 1 button
         Button supermarket1Button = new Button("Asda");
-        ListView<String> supermarket1ListView = new ListView<>();
-        for (itemClass item : superMarket1) {
-            String stock = " ";
-            if(item.getAvailability() == true){
-                stock = "available";
-            }
-            else stock = "unavailable";
+        supermarket1Button.setOnAction(e -> handleSupermarketSelection(superMarket1, "Asda"));
 
-            supermarket1ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " " + stock);
-        }
-
-        // supermarket 2 section
+        // Supermarket 2 button
         Button supermarket2Button = new Button("Tesco");
-        ListView<String> supermarket2ListView = new ListView<>();
-        for (itemClass item : superMarket2) {
-            String stock = " ";
-            if(item.getAvailability() == true){
-                stock = "available";
-            }
-            else stock = "unavailable";
+        supermarket2Button.setOnAction(e -> handleSupermarketSelection(superMarket2, "Tesco"));
 
-            supermarket2ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " " + stock);
-        }
+        // Setting up layout
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(10));
+        vbox.getChildren().addAll(welcomeLabel, supermarket1Button, supermarket2Button);
 
-        // setting up layout
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(
-                welcomeLabel,
-                supermarket1Button,
-                supermarket1ListView,
-                supermarket2Button,
-                supermarket2ListView
-        );
-
-        Scene scene = new Scene(vbox, 600, 600);
+        Scene scene = new Scene(vbox, 600, 300);
         primaryStage.setTitle("SSH Delivery");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-        
-    public static void main (String[] args) {
+    private void handleSupermarketSelection(List<itemClass> supermarket, String supermarketName) {
+        Stage stage = new Stage();
 
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label instruction = new Label("Choose your name to start an order at " + supermarketName + ":");
+        ComboBox<String> userDropdown = new ComboBox<>();
+        for (userClass user : users) {
+            userDropdown.getItems().add(user.getName());
+        }
+
+        Button proceedButton = new Button("Start Order");
+        proceedButton.setOnAction(e -> {
+            if (userDropdown.getValue() != null) {
+                String selectedUser = userDropdown.getValue();
+                stage.close();
+                handleUserOrder(selectedUser, supermarket, supermarketName);
+            }
+        });
+
+        layout.getChildren().addAll(instruction, userDropdown, proceedButton);
+        Scene scene = new Scene(layout, 400, 200);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void handleUserOrder(String userName, List<itemClass> supermarket, String supermarketName) {
+        Stage stage = new Stage();
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label welcome = new Label("Welcome " + userName + "! Select items to add to your order:");
+        ListView<CheckBox> itemListView = new ListView<>();
+        for (itemClass item : supermarket) {
+            CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice());
+            itemListView.getItems().add(itemCheckBox);
+        }
+
+        Button finalizeButton = new Button("Finalize Order");
+        finalizeButton.setOnAction(e -> {
+            userClass user = getUserByName(userName);
+            if (user != null) {
+                for (CheckBox itemCheckBox : itemListView.getItems()) {
+                    if (itemCheckBox.isSelected()) {
+                        String itemName = itemCheckBox.getText().split(" - ")[0];
+                        itemClass selectedItem = getItemByName(supermarket, itemName);
+                        if (selectedItem != null) {
+                            user.getIndividualItems().add(selectedItem);
+                        }
+                    }
+                }
+                stage.close();
+                finalizeOrder(user);
+            }
+        });
+
+        layout.getChildren().addAll(welcome, itemListView, finalizeButton);
+        Scene scene = new Scene(layout, 400, 300);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void finalizeOrder(userClass user) {
+        Stage stage = new Stage();
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label summary = new Label("Order Summary for " + user.getName() + ":");
+        ListView<String> orderListView = new ListView<>();
+        totalCost = 0; // Use the class-level variable
+
+        for (itemClass item : user.getIndividualItems()) {
+            orderListView.getItems().add(item.getName() + " - $" + item.getPrice());
+            totalCost += item.getPrice(); // Update the class-level variable
+        }
+
+        Label totalCostLabel = new Label("Total Cost: $" + totalCost);
+        Label balanceLabel = new Label("Remaining Balance: $" + (user.getAccountBalance() - totalCost));
+
+        Button confirmButton = new Button("Confirm Order");
+        confirmButton.setOnAction(e -> {
+            if (totalCost <= user.getAccountBalance()) {
+                user.setAccountBalance(user.getAccountBalance() - totalCost);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Order Confirmed!");
+                alert.showAndWait();
+                stage.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Insufficient Balance!");
+                alert.showAndWait();
+            }
+        });
+
+        layout.getChildren().addAll(summary, orderListView, totalCostLabel, balanceLabel, confirmButton);
+        stage.setScene(new Scene(layout, 400, 300));
+        stage.show();
+    }
+
+
+    private userClass getUserByName(String name) {
+        for (userClass user : users) {
+            if (user.getName().equals(name)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private itemClass getItemByName(List<itemClass> supermarket, String itemName) {
+        for (itemClass item : supermarket) {
+            if (item.getName().equals(itemName)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
         launch(args);
-
-        // prompt for username, chosen supermarket
-
-        // initiate order object with username and supermarket
-
-        // display items from the chosen supermarket to the user
-
-        // loop for user to keep adding items, warning when exceeding budget and when exceeding balance. add the item to the users item list.
-        // also prompt user to add shared items (potentially after adding their normal items). add the item to the users shared items.
-        // we would also need to keep track of who they want to share it with so we can add it to their items too.
-
-        // exit loop once user finishes adding items and then either start a new loop for next user or allow finalisation.
-        // we repeat this until max number of users have done it which we will just hardcode to number of users we initialise.
-        // we need to make sure we track every user who has participated to the order, we do this by adding them to the list of participants in Order class.
-
-        // after they press finalisation, we need confirmation from each user that was a part of the order. to simulate this we will simply display their order, associated costs,
-        // balance before and after, and say "username do you accept"
-        
-        // we do this for each user and then once all have confirmed we will "submit" the order
     }
 }
