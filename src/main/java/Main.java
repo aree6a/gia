@@ -1,16 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,9 +15,10 @@ public class Main extends Application {
     public static List<itemClass> superMarket1 = new ArrayList<>();
     public static List<itemClass> superMarket2 = new ArrayList<>();
 
-    private double totalCost = 0.0; // Declare at the class level
+    private double totalCost = 0.0; // Class-level variable for totalCost
 
-    // Initialize supermarket items
+    public static List<userClass> users = new ArrayList<>();
+
     public static void initializeSuperMarkets() {
         superMarket1.add(new itemClass("Eggs", 2, true));
         superMarket1.add(new itemClass("Milk", 1.2, true));
@@ -49,15 +45,13 @@ public class Main extends Application {
         superMarket2.add(new itemClass("Dog Food", 10.0, true));
     }
 
-    public static List<userClass> users = new ArrayList<>();
-
-    // Initialize users
     public static void initializeUsers() {
-        users.add(new userClass("Ismaiel", 2000.0, 250));
-        users.add(new userClass("Ghuas", 1252.0, 440));
-        users.add(new userClass("Hassan", 1701.0, 600));
-        users.add(new userClass("Ziad", 1926.0, 200));
-        users.add(new userClass("Areeba", 10000.0, 300));
+        // Now each userClass object is created with a password
+        users.add(new userClass("Ismaiel", 2000.0, 250, "ismaielPass123"));
+        users.add(new userClass("Ghuas", 1252.0, 440, "ghuasPass456"));
+        users.add(new userClass("Hassan", 1701.0, 600, "hassanPass789"));
+        users.add(new userClass("Ziad", 1926.0, 200, "ziadPass000"));
+        users.add(new userClass("Areeba", 10000.0, 300, "areebaPass999"));
     }
 
     @Override
@@ -78,23 +72,13 @@ public class Main extends Application {
 
         ListView<String> supermarket1ListView = new ListView<>();
         for (itemClass item : superMarket1) {
-            String stock = " ";
-            if(item.getAvailability() == true){
-                stock = "available";
-            }
-            else stock = "unavailable";
-
+            String stock = item.getAvailability() ? "available" : "unavailable";
             supermarket1ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " - " + stock);
         }
 
         ListView<String> supermarket2ListView = new ListView<>();
         for (itemClass item : superMarket2) {
-            String stock = " ";
-            if(item.getAvailability() == true){
-                stock = "available";
-            }
-            else stock = "unavailable";
-
+            String stock = item.getAvailability() ? "available" : "unavailable";
             supermarket2ListView.getItems().add(item.getName() + " - $" + item.getPrice() + " - " + stock);
         }
 
@@ -115,34 +99,53 @@ public class Main extends Application {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
 
-        Label instruction = new Label("Choose your name to start an order at " + supermarketName + ":");  
+        Label instruction = new Label("Choose your name to start an order at " + supermarketName + ":");
+
         ComboBox<userClass> userDropdown = new ComboBox<>();
-        for (userClass user : users) {                                              
-            userDropdown.getItems().add(user);            // ADDING USER OBJECTS TO THE COMBO BOX (THESE WOULD BE DISPLAYED AS userClass@2726, userClass@1830, etc)
+        for (userClass user : users) {
+            userDropdown.getItems().add(user);
         }
 
-         userDropdown.setCellFactory(lv -> new ListCell<userClass>() {  //SET CELL FACTORY AND BUTTON BOTH MAKE IT SO THAT THE OBJECTS ARE DISPLAYED AS THEIR NAME ATTRIUBUTE (user.getName)
-        @Override                                                       //PLEASE IN FUTURE USE THE OBJECTS AND DONT JUST PASS STRINGS INTO FUNCTIONS, THE CLASSES HAVE BEEN DEFINED FOR A REASON   
-        protected void updateItem(userClass user, boolean empty) {
-            super.updateItem(user, empty);
-            setText(empty ? null : user.getName());
-        }
-    });
+        userDropdown.setCellFactory(lv -> new ListCell<userClass>() {
+            @Override
+            protected void updateItem(userClass user, boolean empty) {
+                super.updateItem(user, empty);
+                setText(empty ? null : user.getName());
+            }
+        });
 
-    userDropdown.setButtonCell(new ListCell<userClass>() {
-        @Override
-        protected void updateItem(userClass user, boolean empty) {  
-            super.updateItem(user, empty);
-            setText(empty ? null : user.getName());
-        }
-    });
+        userDropdown.setButtonCell(new ListCell<userClass>() {
+            @Override
+            protected void updateItem(userClass user, boolean empty) {
+                super.updateItem(user, empty);
+                setText(empty ? null : user.getName());
+            }
+        });
 
         Button proceedButton = new Button("Start Order");
         proceedButton.setOnAction(e -> {
             if (userDropdown.getValue() != null) {
-                userClass selectedUser = userDropdown.getValue(); // HERE WE NOW HAVE THE OBJECT INSTEAD OF A STRING AS WE DID IN THE LAST COMMIT, THIS MAKES WORKING WITH THE REST 
-                stage.close();                                    // OF THE FUNCTIONS MUCH EASIER AND IT WILL FLOW MUCH BETTER
-                handleUserOrder(selectedUser, supermarket);
+                userClass selectedUser = userDropdown.getValue();
+
+                // Prompt for password
+                TextInputDialog passwordDialog = new TextInputDialog();
+                passwordDialog.setTitle("Password Verification");
+                passwordDialog.setHeaderText("Enter your password");
+                passwordDialog.setContentText("Password:");
+
+                Optional<String> result = passwordDialog.showAndWait();
+                if (result.isPresent()) {
+                    String enteredPassword = result.get();
+                    if (enteredPassword.equals(selectedUser.getPassword())) {
+                        // Password correct, proceed
+                        stage.close();
+                        handleUserOrder(selectedUser, supermarket);
+                    } else {
+                        // Password incorrect
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "Incorrect password!");
+                        alert.showAndWait();
+                    }
+                }
             }
         });
 
@@ -152,12 +155,7 @@ public class Main extends Application {
         stage.show();
     }
 
-
-
-
-    
-
-    private void handleUserOrder(userClass user, List<itemClass> supermarket) { 
+    private void handleUserOrder(userClass user, List<itemClass> supermarket) {
         Stage stage = new Stage();
 
         VBox layout = new VBox(10);
@@ -167,43 +165,26 @@ public class Main extends Application {
 
         ListView<CheckBox> itemListView = new ListView<>();
         for (itemClass item : supermarket) {
-            String stock = " ";
-            if(item.getAvailability() == true){
-                stock = "available";
-            }
-            else stock = "unavailable";
-
+            String stock = item.getAvailability() ? "available" : "unavailable";
             CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice() + " - " + stock);
             itemListView.getItems().add(itemCheckBox);
-
         }
-    
-        Button addUser = new Button("Add User To Order");
-        addUser.setOnAction(e-> {
-            // do iab
-        });
+
         Button finalizeButton = new Button("Finalize Order");
         finalizeButton.setOnAction(e -> {
-
-            ArrayList<itemClass> currentIndivualsItems = new ArrayList<>();
+            ArrayList<itemClass> currentIndividualItems = new ArrayList<>();
             for (CheckBox itemCheckBox : itemListView.getItems()) {
                 if (itemCheckBox.isSelected()) {
                     String itemName = itemCheckBox.getText().split(" - ")[0];
-
                     itemClass selectedItem = getItemByName(supermarket, itemName);
                     if (selectedItem != null) {
-                        System.out.println("Selecting" + itemName);
+                        currentIndividualItems.add(selectedItem);
                     }
-                    currentIndivualsItems.add(selectedItem);
                 }
             }
-                user.setIndividualItems(currentIndivualsItems);
-
-                System.out.println(user.getIndividualItems());
-
-                stage.close();
-                finalizeOrder(user);
-            
+            user.setIndividualItems(currentIndividualItems);
+            stage.close();
+            finalizeOrder(user);
         });
 
         layout.getChildren().addAll(welcome, itemListView, finalizeButton);
@@ -212,10 +193,6 @@ public class Main extends Application {
         stage.show();
     }
 
-
-
-
-
     private void finalizeOrder(userClass user) {
         Stage stage = new Stage();
         VBox layout = new VBox(10);
@@ -223,11 +200,11 @@ public class Main extends Application {
 
         Label summary = new Label("Order Summary for " + user.getName() + ":");
         ListView<String> orderListView = new ListView<>();
-        totalCost = 0; // Use the class-level variable
+        totalCost = 0; // Reset total cost
 
         for (itemClass item : user.getIndividualItems()) {
             orderListView.getItems().add(item.getName() + " - $" + item.getPrice());
-            totalCost += item.getPrice(); // Update the class-level variable
+            totalCost += item.getPrice();
         }
 
         Label totalCostLabel = new Label("Total Cost: $" + totalCost);
@@ -250,7 +227,6 @@ public class Main extends Application {
         stage.setScene(new Scene(layout, 400, 300));
         stage.show();
     }
-
 
     private itemClass getItemByName(List<itemClass> supermarket, String itemName) {
         for (itemClass item : supermarket) {
