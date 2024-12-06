@@ -152,6 +152,11 @@ public class Main extends Application {
         stage.show();
     }
 
+
+
+
+    
+
     private void handleUserOrder(userClass user, List<itemClass> supermarket) { 
         Stage stage = new Stage();
 
@@ -159,6 +164,7 @@ public class Main extends Application {
         layout.setPadding(new Insets(10));
 
         Label welcome = new Label("Welcome " + user.getName() + "! Select items to add to your order:");
+
         ListView<CheckBox> itemListView = new ListView<>();
         for (itemClass item : supermarket) {
             String stock = " ";
@@ -172,22 +178,32 @@ public class Main extends Application {
 
         }
     
-
+        Button addUser = new Button("Add User To Order");
+        addUser.setOnAction(e-> {
+            // do iab
+        });
         Button finalizeButton = new Button("Finalize Order");
         finalizeButton.setOnAction(e -> {
-            if (user != null) {
-                for (CheckBox itemCheckBox : itemListView.getItems()) {
-                    if (itemCheckBox.isSelected()) {
-                        String itemName = itemCheckBox.getText().split(" - ")[0];
-                        itemClass selectedItem = getItemByName(supermarket, itemName);
-                        if (selectedItem != null) {
-                            user.getIndividualItems().add(selectedItem);
-                        }
+
+            ArrayList<itemClass> currentIndivualsItems = new ArrayList<>();
+            for (CheckBox itemCheckBox : itemListView.getItems()) {
+                if (itemCheckBox.isSelected()) {
+                    String itemName = itemCheckBox.getText().split(" - ")[0];
+
+                    itemClass selectedItem = getItemByName(supermarket, itemName);
+                    if (selectedItem != null) {
+                        System.out.println("Selecting" + itemName);
                     }
+                    currentIndivualsItems.add(selectedItem);
                 }
+            }
+                user.setIndividualItems(currentIndivualsItems);
+
+                System.out.println(user.getIndividualItems());
+
                 stage.close();
                 finalizeOrder(user);
-            }
+            
         });
 
         layout.getChildren().addAll(welcome, itemListView, finalizeButton);
@@ -195,6 +211,10 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+
+
+
 
     private void finalizeOrder(userClass user) {
         Stage stage = new Stage();
@@ -231,15 +251,6 @@ public class Main extends Application {
         stage.show();
     }
 
-
-    private userClass getUserByName(String name) {
-        for (userClass user : users) {
-            if (user.getName().equals(name)) {
-                return user;
-            }
-        }
-        return null;
-    }
 
     private itemClass getItemByName(List<itemClass> supermarket, String itemName) {
         for (itemClass item : supermarket) {
