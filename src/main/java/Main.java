@@ -5,7 +5,14 @@ import java.util.Optional;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -139,7 +146,7 @@ public class Main extends Application {
                     if (enteredPassword.equals(selectedUser.getPassword())) {
                         // Password correct, proceed
                         stage.close();
-                        handleUserOrder(selectedUser, supermarket);
+                        handleUserOrder(selectedUser, supermarket, supermarketName);
                     } else {
                         // Password incorrect
                         Alert alert = new Alert(Alert.AlertType.ERROR, "Incorrect password!");
@@ -155,7 +162,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    private void handleUserOrder(userClass user, List<itemClass> supermarket) {
+    private void handleUserOrder(userClass user, List<itemClass> supermarket, String supermarketName) {
         Stage stage = new Stage();
 
         VBox layout = new VBox(10);
@@ -169,6 +176,23 @@ public class Main extends Application {
             CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice() + " - " + stock);
             itemListView.getItems().add(itemCheckBox);
         }
+
+        Button addUser = new Button("Add User To Order");
+        addUser.setOnAction(e-> {
+            ArrayList<itemClass> currentIndividualItems = new ArrayList<>();
+            for (CheckBox itemCheckBox : itemListView.getItems()) {
+                if (itemCheckBox.isSelected()) {
+                    String itemName = itemCheckBox.getText().split(" - ")[0];
+                    itemClass selectedItem = getItemByName(supermarket, itemName);
+                    if (selectedItem != null) {
+                        currentIndividualItems.add(selectedItem);
+                    }
+                }
+            }
+            user.setIndividualItems(currentIndividualItems);
+            stage.close();
+            handleSupermarketSelection(supermarket, supermarketName);
+        });
 
         Button finalizeButton = new Button("Finalize Order");
         finalizeButton.setOnAction(e -> {
@@ -184,21 +208,21 @@ public class Main extends Application {
             }
             user.setIndividualItems(currentIndividualItems);
             stage.close();
-            finalizeOrder(user);
+            finalizeOrder();
         });
 
-        layout.getChildren().addAll(welcome, itemListView, finalizeButton);
+        layout.getChildren().addAll(welcome, itemListView, addUser, finalizeButton);
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
         stage.show();
     }
 
-    private void finalizeOrder(userClass user) {
+    private void finalizeOrder() {
         Stage stage = new Stage();
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
-
-        Label summary = new Label("Order Summary for " + user.getName() + ":");
+        for (userClass user : users) {
+            Label summary = new Label("Order Summary for " + user.getName() + ":");
         ListView<String> orderListView = new ListView<>();
         totalCost = 0; // Reset total cost
 
@@ -226,6 +250,8 @@ public class Main extends Application {
         layout.getChildren().addAll(summary, orderListView, totalCostLabel, balanceLabel, confirmButton);
         stage.setScene(new Scene(layout, 400, 300));
         stage.show();
+        }
+        
     }
 
     private itemClass getItemByName(List<itemClass> supermarket, String itemName) {
