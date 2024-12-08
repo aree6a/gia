@@ -21,4 +21,5 @@ jobs:
       - name: "Build project"
         run: ./gradlew build
 
-# CI
+      - name: "Run project no config cache"
+        run: ./gradlew run --no-configuration-cache
