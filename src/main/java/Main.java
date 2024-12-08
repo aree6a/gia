@@ -282,7 +282,7 @@ public class Main extends Application {
             } else {
 
                 for (userClass user : users) {
-                    double userCost = 0.0;
+                    double  userCost = 0.0;
                     for (itemClass item : user.getIndividualItems()) {
                         userCost += item.getPrice();
                     }
