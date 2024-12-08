@@ -7,7 +7,11 @@ public class sharedItemClass {
         return sharedBy;
     }
 
-    public void setSharedBy(ArrayList<userClass> sharedBy) {
-        this.sharedBy = sharedBy;
+    public void addSharedBy(userClass user) {
+        sharedBy.add(user);
+    }
+
+    public int lengthSharedBy() {
+        return sharedBy.size();
     }
 }

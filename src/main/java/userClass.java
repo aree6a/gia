@@ -50,8 +50,8 @@ public class userClass {
         return individualItems;
     }
 
-    public void setIndividualItems(ArrayList<itemClass> individualItems) {
-        this.individualItems = individualItems;
+    public void addIndividualItems(itemClass item) {
+        individualItems.add(item);
     }
 
     public ArrayList<sharedItemClass> getSharedItems() {

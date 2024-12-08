@@ -22,8 +22,6 @@ public class Main extends Application {
     public static List<itemClass> superMarket1 = new ArrayList<>();
     public static List<itemClass> superMarket2 = new ArrayList<>();
 
-    private double totalCost = 0.0; // Class-level variable for totalCost
-
     public static List<userClass> users = new ArrayList<>();
 
     public static void initializeSuperMarkets() {
@@ -54,11 +52,11 @@ public class Main extends Application {
 
     public static void initializeUsers() {
         // Now each userClass object is created with a password
-        users.add(new userClass("Ismaiel", 2000.0, 250, "ismaielPass123"));
-        users.add(new userClass("Ghuas", 1252.0, 440, "ghuasPass456"));
-        users.add(new userClass("Hassan", 1701.0, 600, "hassanPass789"));
-        users.add(new userClass("Ziad", 1926.0, 200, "ziadPass000"));
-        users.add(new userClass("Areeba", 10000.0, 300, "areebaPass999"));
+        users.add(new userClass("Ismaiel", 2000.0, 250, "isma1"));
+        users.add(new userClass("Ghuas", 1252.0, 440, "ghuas1"));
+        users.add(new userClass("Hassan", 1701.0, 600, "hassan1"));
+        users.add(new userClass("Ziad", 1926.0, 200, "ziad1"));
+        users.add(new userClass("Areeba", 10000.0, 300, "areeba1"));
     }
 
     @Override
@@ -174,39 +172,45 @@ public class Main extends Application {
         for (itemClass item : supermarket) {
             String stock = item.getAvailability() ? "available" : "unavailable";
             CheckBox itemCheckBox = new CheckBox(item.getName() + " - $" + item.getPrice() + " - " + stock);
+            if (!item.getAvailability()) {
+                itemCheckBox.setDisable(true);
+            }
             itemListView.getItems().add(itemCheckBox);
         }
 
         Button addUser = new Button("Add User To Order");
         addUser.setOnAction(e-> {
-            ArrayList<itemClass> currentIndividualItems = new ArrayList<>();
             for (CheckBox itemCheckBox : itemListView.getItems()) {
                 if (itemCheckBox.isSelected()) {
                     String itemName = itemCheckBox.getText().split(" - ")[0];
                     itemClass selectedItem = getItemByName(supermarket, itemName);
                     if (selectedItem != null) {
-                        currentIndividualItems.add(selectedItem);
+                        user.addIndividualItems(selectedItem);
                     }
                 }
             }
-            user.setIndividualItems(currentIndividualItems);
+            System.out.println(user.getIndividualItems());
             stage.close();
             handleSupermarketSelection(supermarket, supermarketName);
         });
 
+        // **NEW BUTTON: Add Shared Item**
+        Button addSharedItemButton = new Button("Add Shared Item");
+        addSharedItemButton.setOnAction(e -> {
+            handleAddSharedItem(user, supermarket, supermarketName);
+        });
+
         Button finalizeButton = new Button("Finalize Order");
         finalizeButton.setOnAction(e -> {
-            ArrayList<itemClass> currentIndividualItems = new ArrayList<>();
             for (CheckBox itemCheckBox : itemListView.getItems()) {
                 if (itemCheckBox.isSelected()) {
                     String itemName = itemCheckBox.getText().split(" - ")[0];
                     itemClass selectedItem = getItemByName(supermarket, itemName);
                     if (selectedItem != null) {
-                        currentIndividualItems.add(selectedItem);
+                        user.addIndividualItems(selectedItem);
                     }
                 }
             }
-            user.setIndividualItems(currentIndividualItems);
             stage.close();
             finalizeOrder();
         });
@@ -217,40 +221,83 @@ public class Main extends Application {
         stage.show();
     }
 
+    private void handleAddSharedItem(userClass currentUser, List<itemClass> supermarket, String supermarketName) {
+        Stage sharedStage = new Stage();
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        Label selectItemLabel = new Label("Select an item to share:");
+    }
+
+
     private void finalizeOrder() {
         Stage stage = new Stage();
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
-        for (userClass user : users) {
-            Label summary = new Label("Order Summary for " + user.getName() + ":");
-        ListView<String> orderListView = new ListView<>();
-        totalCost = 0; // Reset total cost
 
-        for (itemClass item : user.getIndividualItems()) {
-            orderListView.getItems().add(item.getName() + " - $" + item.getPrice());
-            totalCost += item.getPrice();
+        double grandTotal = 0.0;
+
+        for (userClass user : users) {
+            List<itemClass> userItems = user.getIndividualItems();
+            List<sharedItemClass> userSharedItems = user.getSharedItems();
+            if (!userItems.isEmpty() || !userSharedItems.isEmpty()) {
+
+                Label userSummary = new Label("Order Summary for " + user.getName() + ":");
+                ListView<String> orderListView = new ListView<>();
+                double userTotal = 0.0;
+                for (itemClass item : userItems) {
+                    orderListView.getItems().add(item.getName() + " - $" + item.getPrice());
+                    userTotal += item.getPrice();
+                }
+                grandTotal += userTotal;
+
+                Label totalCostLabel = new Label("User Total: $" + userTotal);
+                Label balanceLabel = new Label("User Balance After Transaction: $" + (user.getAccountBalance() - userTotal));
+
+                layout.getChildren().addAll(userSummary, orderListView, totalCostLabel, balanceLabel);
+            }
         }
 
-        Label totalCostLabel = new Label("Total Cost: $" + totalCost);
-        Label balanceLabel = new Label("Remaining Balance: $" + (user.getAccountBalance() - totalCost));
+        Label grandTotalLabel = new Label("Grand Total for All Users: $" + grandTotal);
+        grandTotalLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
 
-        Button confirmButton = new Button("Confirm Order");
-        confirmButton.setOnAction(e -> {
-            if (totalCost <= user.getAccountBalance()) {
-                user.setAccountBalance(user.getAccountBalance() - totalCost);
+        Button confirmOrderButton = new Button("Confirm Order");
+        confirmOrderButton.setOnAction(e -> {
+
+            boolean allCanPay = true;
+            for (userClass user : users) {
+                double userCost = 0.0;
+                for (itemClass item : user.getIndividualItems()) {
+                    userCost += item.getPrice();
+                }
+                if (userCost > user.getAccountBalance()) {
+                    allCanPay = false;
+                    break;
+                }
+            }
+
+            if (!allCanPay) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "One or more users have insufficient balance!");
+                alert.showAndWait();
+            } else {
+
+                for (userClass user : users) {
+                    double userCost = 0.0;
+                    for (itemClass item : user.getIndividualItems()) {
+                        userCost += item.getPrice();
+                    }
+                    user.setAccountBalance(user.getAccountBalance() - userCost);
+                }
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Order Confirmed!");
                 alert.showAndWait();
                 stage.close();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Insufficient Balance!");
-                alert.showAndWait();
             }
         });
 
-        layout.getChildren().addAll(summary, orderListView, totalCostLabel, balanceLabel, confirmButton);
-        stage.setScene(new Scene(layout, 400, 300));
+        layout.getChildren().addAll(grandTotalLabel, confirmOrderButton);
+
+        stage.setScene(new Scene(layout, 450, 500));
         stage.show();
-        }
         
     }
 
@@ -265,6 +312,5 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-
     }
 }
