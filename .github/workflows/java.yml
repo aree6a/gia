@@ -38,4 +38,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          path: build/distributions/gia.zip
+          path: build/distributions/deliverySSH.zip
+          name: gia-java-${{ matrix.java-version }}
+#
