@@ -20,3 +20,5 @@ jobs:
 
       - name: "Build project"
         run: ./gradlew build
+
+# CI
