@@ -9,11 +9,23 @@ on:
 jobs:
   build:
     name: "Build"
-    runs-on: "ubuntu-latest"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        java-version: [8, 17, 21]
+        os: ["ubuntu-latest", "macos-latest"]
 
     steps:
       - name: "Clone repository"
         uses: actions/checkout@v4
+
+      - name: "Setup Java"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ matrix.java-version }}
+          cache: "gradle"
 
       - name: "Give gradlew execute permission"
         run: chmod +x gradlew
@@ -21,3 +33,10 @@ jobs:
       - name: "Build project"
         run: ./gradlew build
 
+      - name: "Produce distribution"
+        run: ./gradlew distZip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: build/distributions/gia.zip
+          name: gia-java-${{ matrix.java-version }}
