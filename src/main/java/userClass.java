@@ -15,7 +15,7 @@ public class userClass {
         this.accountBalance = accountBalance;
         this.monthlyBudget = monthlyBudget;
         this.password = password;
-        // Initialize the item lists if needed
+
         this.individualItems = new ArrayList<>();
         this.sharedItems = new ArrayList<>();
         this.hasConfirmed = false; // default value
@@ -58,8 +58,8 @@ public class userClass {
         return sharedItems;
     }
 
-    public void setSharedItems(ArrayList<sharedItemClass> sharedItems) {
-        this.sharedItems = sharedItems;
+    public void addSharedItems(sharedItemClass item) {
+        sharedItems.add(item);
     }
 
     public boolean isHasConfirmed() {

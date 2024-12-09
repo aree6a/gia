@@ -178,6 +178,8 @@ public class Main extends Application {
             itemListView.getItems().add(itemCheckBox);
         }
 
+
+
         Button addUser = new Button("Add User To Order");
         addUser.setOnAction(e-> {
             for (CheckBox itemCheckBox : itemListView.getItems()) {
@@ -230,7 +232,7 @@ public class Main extends Application {
     }
 
 
-    private void finalizeOrder() {
+    public static void finalizeOrder() {
         Stage stage = new Stage();
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -301,7 +303,7 @@ public class Main extends Application {
         
     }
 
-    private itemClass getItemByName(List<itemClass> supermarket, String itemName) {
+    public static itemClass getItemByName(List<itemClass> supermarket, String itemName) {
         for (itemClass item : supermarket) {
             if (item.getName().equals(itemName)) {
                 return item;
